@@ -11,6 +11,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.feicuiedu.gitdroid.R;
+import com.feicuiedu.gitdroid.components.FooterView;
+import com.mugen.Mugen;
+import com.mugen.MugenCallbacks;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,13 +28,14 @@ import in.srain.cube.views.ptr.header.StoreHouseHeader;
 /**
  * Created by DELL on 2016/7/27.
  */
-public class RepoListFragment extends Fragment {
+public class RepoListFragment extends Fragment implements RepoListView {
     @BindView(R.id.lvRepos)ListView listView;
     @BindView(R.id.emptyView) TextView emptyView;
     @BindView(R.id.errorView) TextView errorView;
     @BindView(R.id.ptrClassicFrameLayout) PtrClassicFrameLayout ptrFrameLayout;
     private ArrayAdapter<String> adapter;
     private RepoListPresenter presenter;
+    private FooterView footerView;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -50,10 +54,31 @@ public class RepoListFragment extends Fragment {
         datas.add("4444");
         adapter = new ArrayAdapter<String>(getContext(),android.R.layout.simple_list_item_1,datas);
         listView.setAdapter(adapter);
-        init();
+        initHead();
+        initFoot();
     }
 
-    private void init() {
+    private void initFoot() {
+        footerView = new FooterView(getContext());
+        Mugen.with(listView, new MugenCallbacks() {
+            @Override
+            public void onLoadMore() {
+                presenter.loadMore();
+            }
+
+            @Override
+            public boolean isLoading() {
+                return listView.getFooterViewsCount() > 0 && footerView.isLoading();
+            }
+
+            @Override
+            public boolean hasLoadedAllItems() {
+                return listView.getFooterViewsCount() > 0 && footerView.isComplete();
+            }
+        }).start();
+    }
+
+    private void initHead() {
         //设置刷新间隔冲突
         ptrFrameLayout.setLastUpdateTimeRelateObject(this);
         // 关闭header所用时长
@@ -75,32 +100,59 @@ public class RepoListFragment extends Fragment {
         ptrFrameLayout.addPtrUIHandler(header);
         ptrFrameLayout.setBackgroundResource(R.color.colorRefresh);
     }
+    @Override
     public void showContentView() {
         ptrFrameLayout.setVisibility(View.VISIBLE);
         emptyView.setVisibility(View.GONE);
         errorView.setVisibility(View.GONE);
     }
-
+    @Override
     public void showErrorView(String errorMsg) {
         ptrFrameLayout.setVisibility(View.GONE);
         emptyView.setVisibility(View.GONE);
         errorView.setVisibility(View.VISIBLE);
     }
-
+    @Override
     public void showEmptyView() {
         ptrFrameLayout.setVisibility(View.GONE);
         emptyView.setVisibility(View.VISIBLE);
         errorView.setVisibility(View.GONE);
     }
-
+    @Override
     public void stopRefresh() {
         ptrFrameLayout.refreshComplete();
     }
-
+    @Override
     public void refreshData(List<String> data) {
         adapter.clear();
         adapter.addAll(data);
         adapter.notifyDataSetChanged();
     }
 
+    @Override
+    public void showLoadMoreLoading() {
+        if (listView.getFooterViewsCount() == 0) {
+            listView.addFooterView(footerView);
+        }
+        footerView.showLoading();
+    }
+
+    @Override
+    public void hideLoadMore() {
+        listView.removeFooterView(footerView);
+    }
+
+    @Override
+    public void showLoadMoreErro(String erroMsg) {
+        if (listView.getFooterViewsCount() == 0) {
+            listView.addFooterView(footerView);
+        }
+        footerView.showError(erroMsg);
+    }
+
+    @Override
+    public void addMoreData(List<String> datas) {
+        adapter.addAll(datas);
+        adapter.notifyDataSetChanged();
+    }
 }
