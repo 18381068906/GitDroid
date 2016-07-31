@@ -1,6 +1,7 @@
 package com.feicuiedu.gitdroid.network;
 
 import com.feicuiedu.gitdroid.login.AccessTokenResult;
+import com.feicuiedu.gitdroid.login.User;
 
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
@@ -21,16 +22,17 @@ public class GitHubClient implements GitHubApi{
         return gitHubClient;
     }
     private GitHubClient() {
-        OkHttpClient okHttpClient =new OkHttpClient.Builder().build();
+        OkHttpClient okHttpClient =new OkHttpClient.Builder().addInterceptor(new TokenInterceptor()).build();
         Retrofit retrofit = new Retrofit.Builder().baseUrl("https://api.github.com/").client(okHttpClient).addConverterFactory(GsonConverterFactory.create()).build();
         gitHubApi = retrofit.create(GitHubApi.class);
     }
-    public GitHubApi getGitHubApi(){
-        return gitHubApi;
-    }
+
 
     @Override
     public Call<AccessTokenResult> getOAuthToken(@Field("client_id") String client, @Field("client_secret") String clientSecret, @Field("code") String code) {
-        return getOAuthToken(client,clientSecret,code);
+        return gitHubApi.getOAuthToken(client,clientSecret,code);
+    }
+    @Override public Call<User> getUserInfo() {
+        return gitHubApi.getUserInfo();
     }
 }

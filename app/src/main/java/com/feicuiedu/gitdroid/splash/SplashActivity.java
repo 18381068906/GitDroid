@@ -5,11 +5,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
+
 
 import com.feicuiedu.gitdroid.MainActivity;
 import com.feicuiedu.gitdroid.R;
 import com.feicuiedu.gitdroid.commons.ActivityUtils;
+import com.feicuiedu.gitdroid.login.LoginActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -34,7 +35,7 @@ public class SplashActivity extends AppCompatActivity {
                 finish();
                 break;
             case R.id.btnLogin:
-                Toast.makeText(SplashActivity.this, "登录", Toast.LENGTH_SHORT).show();
+                activityUtils.startActivity(LoginActivity.class);
                 break;
         }
     }

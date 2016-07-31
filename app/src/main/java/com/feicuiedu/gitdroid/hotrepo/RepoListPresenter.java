@@ -28,12 +28,12 @@ public class RepoListPresenter {
     }
 
     public void refresh() {
-        new RefreshTask().execute();
-        GitHubClient gitHubClient= new GitHubClient();
-        GitHubApi gitHubApi = gitHubClient.getGitHubApi();
-        Call<ResponseBody> call = gitHubApi.getRetrofitContributors();
-        //异步获取数据
-        call.enqueue(callback);
+//        new RefreshTask().execute();
+//        GitHubClient gitHubClient= new GitHubClient();
+//        GitHubApi gitHubApi = gitHubClient.getGitHubApi();
+//        Call<ResponseBody> call = gitHubApi.getRetrofitContributors();
+//        //异步获取数据
+//        call.enqueue(callback);
     }
     private Callback<ResponseBody> callback = new Callback<ResponseBody>() {
         //成功
@@ -48,6 +48,7 @@ public class RepoListPresenter {
                         return;
                     }
                     String text = body.string();
+                    repoListView.showContentView();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -56,7 +57,8 @@ public class RepoListPresenter {
         //失败
         @Override
         public void onFailure(Call<ResponseBody> call, Throwable t) {
-
+            repoListView.stopRefresh();
+            repoListView.showContentView();
         }
     };
     class RefreshTask extends AsyncTask<Void,Void,Void> {

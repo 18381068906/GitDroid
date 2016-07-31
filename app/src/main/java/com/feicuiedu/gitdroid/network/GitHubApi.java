@@ -1,10 +1,9 @@
 package com.feicuiedu.gitdroid.network;
 
-import android.support.annotation.FractionRes;
-
 import com.feicuiedu.gitdroid.login.AccessTokenResult;
+import com.feicuiedu.gitdroid.login.User;
 
-import okhttp3.ResponseBody;
+
 import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
@@ -43,4 +42,7 @@ public interface GitHubApi {
             @Field("client_id") String client,
             @Field("client_secret") String clientSecret,
             @Field("code") String code);
+
+    @GET("user")
+    Call<User> getUserInfo();
 }
