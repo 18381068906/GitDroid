@@ -6,16 +6,16 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.feicuiedu.gitdroid.R;
 import com.feicuiedu.gitdroid.components.FooterView;
+import com.feicuiedu.gitdroid.repoinfo.RepoInfoActivity;
 import com.mugen.Mugen;
 import com.mugen.MugenCallbacks;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -29,13 +29,26 @@ import in.srain.cube.views.ptr.header.StoreHouseHeader;
  * Created by DELL on 2016/7/27.
  */
 public class RepoListFragment extends Fragment implements RepoListView {
+    private static final String KEY_LANGUAGE = "key_language";
+
+    public static RepoListFragment getInstance(Language language){
+        RepoListFragment fragment = new RepoListFragment();
+        Bundle args = new Bundle();
+        args.putSerializable(KEY_LANGUAGE,language);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    private Language getLanguage() {
+        return (Language)getArguments().getSerializable(KEY_LANGUAGE);
+    }
     @BindView(R.id.lvRepos)ListView listView;
     @BindView(R.id.emptyView) TextView emptyView;
     @BindView(R.id.errorView) TextView errorView;
     @BindView(R.id.ptrClassicFrameLayout) PtrClassicFrameLayout ptrFrameLayout;
-    private ArrayAdapter<String> adapter;
     private RepoListPresenter presenter;
     private FooterView footerView;
+    private RepoListAdapter adapter;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -46,16 +59,19 @@ public class RepoListFragment extends Fragment implements RepoListView {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
-        presenter = new RepoListPresenter(this);
-        ArrayList<String> datas = new ArrayList<>();
-        datas.add("1111");
-        datas.add("2222");
-        datas.add("3333");
-        datas.add("4444");
-        adapter = new ArrayAdapter<String>(getContext(),android.R.layout.simple_list_item_1,datas);
+        presenter = new RepoListPresenter(this,getLanguage());
+        adapter = new RepoListAdapter();
         listView.setAdapter(adapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Repo repo = adapter.getItem(position);
+                RepoInfoActivity.open(getContext(),repo);
+            }
+        });
         initHead();
         initFoot();
+        presenter.refresh();
     }
 
     private void initFoot() {
@@ -123,10 +139,9 @@ public class RepoListFragment extends Fragment implements RepoListView {
         ptrFrameLayout.refreshComplete();
     }
     @Override
-    public void refreshData(List<String> data) {
+    public void refreshData(List<Repo> data) {
         adapter.clear();
         adapter.addAll(data);
-        adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -151,8 +166,7 @@ public class RepoListFragment extends Fragment implements RepoListView {
     }
 
     @Override
-    public void addMoreData(List<String> datas) {
+    public void addMoreData(List<Repo> datas) {
         adapter.addAll(datas);
-        adapter.notifyDataSetChanged();
     }
 }

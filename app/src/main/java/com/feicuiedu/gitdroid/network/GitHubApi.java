@@ -1,15 +1,22 @@
 package com.feicuiedu.gitdroid.network;
 
+import com.feicuiedu.gitdroid.hotrepo.RepoResult;
 import com.feicuiedu.gitdroid.login.AccessTokenResult;
 import com.feicuiedu.gitdroid.login.User;
+import com.feicuiedu.gitdroid.repoinfo.RepoContentResult;
 
 
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 /**
  * Created by DELL on 2016/7/28.
@@ -45,4 +52,36 @@ public interface GitHubApi {
 
     @GET("user")
     Call<User> getUserInfo();
+
+    /**
+     * 获取仓库
+     * @Param query 查询参数(language:java)
+     * @Param pageId 查询页数据(从1开始)
+     */
+    @GET("/search/repositories")
+    Call<RepoResult> searchRepos(
+            @Query("q")String query,
+            @Query("page")int pageId);
+
+
+    /***
+     * 获取readme
+     * @param owner 仓库拥有者
+     * @param repo 仓库名称
+     * @return 仓库的readme页面内容,将是markdown格式且做了base64处理
+     */
+    @GET("/repos/{owner}/{repo}/readme")
+    Call<RepoContentResult> getReadme(
+            @Path("owner") String owner,
+            @Path("repo") String repo);
+
+    /***
+     * 获取一个markdonw内容对应的HTML页面
+     * @param body 请求体,内容来自getReadme后的RepoContentResult
+     */
+    @Headers({
+            "Content-Type:text/plain"
+    })
+    @POST("/markdown/raw")
+    Call<ResponseBody> markDown(@Body RequestBody body);
 }

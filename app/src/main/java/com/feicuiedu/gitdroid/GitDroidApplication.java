@@ -29,7 +29,6 @@ public class GitDroidApplication extends Application{
                 .memoryCacheSize(5 * 1024 * 1024) // 内存缓存
                 .defaultDisplayImageOptions(options) // 设置显示选项
                 .build();
-
         // 初始化ImageLoad
         ImageLoader.getInstance().init(config);
     }

@@ -15,6 +15,6 @@ public interface RepoListPtrView {
     public void showEmptyView();
 
     public void stopRefresh();
-    public void refreshData(List<String> data);
+    public void refreshData(List<Repo> data);
 
 }

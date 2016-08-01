@@ -12,5 +12,5 @@ public interface RepoListLoadMoreView {
 
     void showLoadMoreErro(String erroMsg);
 
-    void addMoreData(List<String> datas);
+    void addMoreData(List<Repo> datas);
 }

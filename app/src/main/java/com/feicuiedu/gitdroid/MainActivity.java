@@ -38,8 +38,6 @@ public class MainActivity extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        imageLoader = ImageLoader.getInstance();
-        imageLoader.init(ImageLoaderConfiguration.createDefault(this));
         activityUtils = new ActivityUtils(this);
     }
 
@@ -121,7 +119,7 @@ public class MainActivity extends AppCompatActivity{
 
         // 设置用户头像
         String photoUrl = UserRepo.getUser().getAvatar();
-        imageLoader.displayImage(photoUrl, ivIcon);
+        ImageLoader.getInstance().displayImage(photoUrl, ivIcon);
     }
 
 }
