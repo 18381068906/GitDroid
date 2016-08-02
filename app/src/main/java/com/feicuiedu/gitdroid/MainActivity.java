@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.feicuiedu.gitdroid.commons.ActivityUtils;
 import com.feicuiedu.gitdroid.hotrepo.HotRepoFragment;
+import com.feicuiedu.gitdroid.hotuser.HotUserFragment;
 import com.feicuiedu.gitdroid.login.LoginActivity;
 import com.feicuiedu.gitdroid.login.User;
 import com.feicuiedu.gitdroid.login.UserRepo;
@@ -29,6 +30,7 @@ public class MainActivity extends AppCompatActivity{
     @BindView(R.id.drawerLayout)DrawerLayout drawerLayout;
     @BindView(R.id.toolbar)Toolbar toolbar;
     private HotRepoFragment hotRepoFragment;
+    private HotUserFragment hotUserFragment;
     private Button btnLogin;
     private ImageView ivIcon;
     private ImageLoader imageLoader;
@@ -78,10 +80,19 @@ public class MainActivity extends AppCompatActivity{
         public boolean onNavigationItemSelected(MenuItem item) {
             switch (item.getItemId()){
                 case R.id.github_hot_repo:
-                    Toast.makeText(MainActivity.this, "热门", Toast.LENGTH_SHORT).show();
+                    if (!hotRepoFragment.isAdded()){
+                        replaceFragment(hotRepoFragment);
+                    }
+                    drawerLayout.closeDrawers();
                     break;
                 case R.id.github_hot_coder:
-                    Toast.makeText(MainActivity.this, "开发者", Toast.LENGTH_SHORT).show();
+                    if (hotUserFragment == null){
+                        hotUserFragment = new HotUserFragment();
+                    }
+                    if (!hotUserFragment.isAdded()){
+                        replaceFragment(hotUserFragment);
+                    }
+                    drawerLayout.closeDrawers();
                     break;
                 case R.id.github_trend:
                     Toast.makeText(MainActivity.this, "流行趋势", Toast.LENGTH_SHORT).show();

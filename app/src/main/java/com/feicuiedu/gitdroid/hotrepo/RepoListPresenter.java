@@ -1,5 +1,7 @@
 package com.feicuiedu.gitdroid.hotrepo;
 
+import android.widget.Toast;
+
 import com.feicuiedu.gitdroid.network.GitHubClient;
 
 import java.util.List;
@@ -47,6 +49,7 @@ public class RepoListPresenter {
         public void onFailure(Call<RepoResult> call, Throwable t) {
             repoListView.stopRefresh();
             repoListView.showContentView();
+            repoListView.showToast("连接失败");
         }
     };
 
@@ -71,7 +74,8 @@ public class RepoListPresenter {
 
         @Override
         public void onFailure(Call<RepoResult> call, Throwable t) {
-
+            repoListView.hideLoadMore();
+            repoListView.showToast("连接失败");
         }
     };
 }

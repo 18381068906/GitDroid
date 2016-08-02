@@ -16,5 +16,5 @@ public interface RepoListPtrView {
 
     public void stopRefresh();
     public void refreshData(List<Repo> data);
-
+    void showToast(String msg);
 }

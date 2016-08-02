@@ -1,4 +1,4 @@
-package com.feicuiedu.gitdroid.hotrepo;
+package com.feicuiedu.gitdroid.hotuser;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -13,7 +13,6 @@ import android.widget.Toast;
 
 import com.feicuiedu.gitdroid.R;
 import com.feicuiedu.gitdroid.components.FooterView;
-import com.feicuiedu.gitdroid.repoinfo.RepoInfoActivity;
 import com.mugen.Mugen;
 import com.mugen.MugenCallbacks;
 
@@ -27,52 +26,37 @@ import in.srain.cube.views.ptr.PtrFrameLayout;
 import in.srain.cube.views.ptr.header.StoreHouseHeader;
 
 /**
- * Created by DELL on 2016/7/27.
+ * Created by DELL on 2016/8/2.
  */
-public class RepoListFragment extends Fragment implements RepoListView {
-    private static final String KEY_LANGUAGE = "key_language";
-
-    public static RepoListFragment getInstance(Language language){
-        RepoListFragment fragment = new RepoListFragment();
-        Bundle args = new Bundle();
-        args.putSerializable(KEY_LANGUAGE,language);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    private Language getLanguage() {
-        return (Language)getArguments().getSerializable(KEY_LANGUAGE);
-    }
-    @BindView(R.id.lvRepos)ListView listView;
-    @BindView(R.id.emptyView) TextView emptyView;
-    @BindView(R.id.errorView) TextView errorView;
-    @BindView(R.id.ptrClassicFrameLayout) PtrClassicFrameLayout ptrFrameLayout;
-    private RepoListPresenter presenter;
+public class HotUserFragment extends Fragment implements HotUserPresenter.HotUserView {
+    @BindView(R.id.lvRepos)ListView lvRepos;
+    @BindView(R.id.emptyView)TextView emptyView;
+    @BindView(R.id.errorView)TextView errorView;
+    @BindView(R.id.ptrClassicFrameLayout)PtrClassicFrameLayout ptrFrameLayout;
+    private HotUserPresenter presenter;
+    private UserListAdapter adapter;
     private FooterView footerView;
-    private RepoListAdapter adapter;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_repo_list,container,false);
+        return inflater.inflate(R.layout.fragment_hot_user,container,false);
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
-        presenter = new RepoListPresenter(this,getLanguage());
-        adapter = new RepoListAdapter();
-        listView.setAdapter(adapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        presenter = new HotUserPresenter(this);
+        adapter = new UserListAdapter();
+        lvRepos.setAdapter(adapter);
+        lvRepos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Repo repo = adapter.getItem(position);
-                RepoInfoActivity.open(getContext(), repo);
+
             }
         });
         initHead();
         initFoot();
-
     }
 
     @Override
@@ -83,7 +67,7 @@ public class RepoListFragment extends Fragment implements RepoListView {
 
     private void initFoot() {
         footerView = new FooterView(getContext());
-        Mugen.with(listView, new MugenCallbacks() {
+        Mugen.with(lvRepos, new MugenCallbacks() {
             @Override
             public void onLoadMore() {
                 presenter.loadMore();
@@ -91,12 +75,12 @@ public class RepoListFragment extends Fragment implements RepoListView {
 
             @Override
             public boolean isLoading() {
-                return listView.getFooterViewsCount() > 0 && footerView.isLoading();
+                return lvRepos.getFooterViewsCount() > 0 && footerView.isLoading();
             }
 
             @Override
             public boolean hasLoadedAllItems() {
-                return listView.getFooterViewsCount() > 0 && footerView.isComplete();
+                return lvRepos.getFooterViewsCount() > 0 && footerView.isComplete();
             }
         }).start();
     }
@@ -124,57 +108,32 @@ public class RepoListFragment extends Fragment implements RepoListView {
         ptrFrameLayout.setBackgroundResource(R.color.colorRefresh);
     }
     @Override
-    public void showContentView() {
-        ptrFrameLayout.setVisibility(View.VISIBLE);
-        emptyView.setVisibility(View.GONE);
-        errorView.setVisibility(View.GONE);
+    public void refresh(List<UserList> userList) {
+        adapter.clear();
+        adapter.addAll(userList);
     }
+
     @Override
-    public void showErrorView(String errorMsg) {
-        ptrFrameLayout.setVisibility(View.GONE);
-        emptyView.setVisibility(View.GONE);
-        errorView.setVisibility(View.VISIBLE);
+    public void loadMore(List<UserList> userList) {
+        adapter.addAll(userList);
     }
-    @Override
-    public void showEmptyView() {
-        ptrFrameLayout.setVisibility(View.GONE);
-        emptyView.setVisibility(View.VISIBLE);
-        errorView.setVisibility(View.GONE);
-    }
+
     @Override
     public void stopRefresh() {
         ptrFrameLayout.refreshComplete();
     }
+
     @Override
-    public void refreshData(List<Repo> data) {
-        adapter.clear();
-        adapter.addAll(data);
+    public void stopLoad() {
+        lvRepos.removeFooterView(footerView);
     }
 
     @Override
-    public void showLoadMoreLoading() {
-        if (listView.getFooterViewsCount() == 0) {
-            listView.addFooterView(footerView);
+    public void showLoadMore() {
+        if (lvRepos.getFooterViewsCount() == 0) {
+            lvRepos.addFooterView(footerView);
         }
         footerView.showLoading();
-    }
-
-    @Override
-    public void hideLoadMore() {
-        listView.removeFooterView(footerView);
-    }
-
-    @Override
-    public void showLoadMoreErro(String erroMsg) {
-        if (listView.getFooterViewsCount() == 0) {
-            listView.addFooterView(footerView);
-        }
-        footerView.showError(erroMsg);
-    }
-
-    @Override
-    public void addMoreData(List<Repo> datas) {
-        adapter.addAll(datas);
     }
 
     @Override
@@ -182,5 +141,6 @@ public class RepoListFragment extends Fragment implements RepoListView {
         if(getContext()!=null){
             Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
         }
+
     }
 }

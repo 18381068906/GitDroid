@@ -1,6 +1,7 @@
 package com.feicuiedu.gitdroid.network;
 
 import com.feicuiedu.gitdroid.hotrepo.RepoResult;
+import com.feicuiedu.gitdroid.hotuser.UserResult;
 import com.feicuiedu.gitdroid.login.AccessTokenResult;
 import com.feicuiedu.gitdroid.login.User;
 import com.feicuiedu.gitdroid.repoinfo.RepoContentResult;
@@ -37,7 +38,7 @@ public class GitHubClient implements GitHubApi{
 
     @Override
     public Call<AccessTokenResult> getOAuthToken(@Field("client_id") String client, @Field("client_secret") String clientSecret, @Field("code") String code) {
-        return gitHubApi.getOAuthToken(client,clientSecret,code);
+        return gitHubApi.getOAuthToken(client, clientSecret, code);
     }
     @Override public Call<User> getUserInfo() {
         return gitHubApi.getUserInfo();
@@ -54,5 +55,11 @@ public class GitHubClient implements GitHubApi{
     @Override public Call<ResponseBody> markDown(@Body RequestBody body) {
         return gitHubApi.markDown(body);
     }
+
+    @Override
+    public Call<UserResult> getUserList(@Query("page") int page) {
+        return gitHubApi.getUserList(page);
+    }
+
 
 }

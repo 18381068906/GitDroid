@@ -1,6 +1,7 @@
 package com.feicuiedu.gitdroid.network;
 
 import com.feicuiedu.gitdroid.hotrepo.RepoResult;
+import com.feicuiedu.gitdroid.hotuser.UserResult;
 import com.feicuiedu.gitdroid.login.AccessTokenResult;
 import com.feicuiedu.gitdroid.login.User;
 import com.feicuiedu.gitdroid.repoinfo.RepoContentResult;
@@ -84,4 +85,10 @@ public interface GitHubApi {
     })
     @POST("/markdown/raw")
     Call<ResponseBody> markDown(@Body RequestBody body);
+
+    /**
+     *
+     */
+    @GET("/search/users?q=followers:%3E1000")
+    Call<UserResult> getUserList(@Query("page")int page);
 }
