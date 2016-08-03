@@ -87,7 +87,7 @@ public interface GitHubApi {
     Call<ResponseBody> markDown(@Body RequestBody body);
 
     /**
-     *
+     *获取热门开发者
      */
     @GET("/search/users?q=followers:%3E1000")
     Call<UserResult> getUserList(@Query("page")int page);

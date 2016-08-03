@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.feicuiedu.gitdroid.commons.ActivityUtils;
+import com.feicuiedu.gitdroid.favorite.FavoriteFragment;
 import com.feicuiedu.gitdroid.hotrepo.HotRepoFragment;
 import com.feicuiedu.gitdroid.hotuser.HotUserFragment;
 import com.feicuiedu.gitdroid.login.LoginActivity;
@@ -31,6 +32,7 @@ public class MainActivity extends AppCompatActivity{
     @BindView(R.id.toolbar)Toolbar toolbar;
     private HotRepoFragment hotRepoFragment;
     private HotUserFragment hotUserFragment;
+    private FavoriteFragment favoriteFragment;
     private Button btnLogin;
     private ImageView ivIcon;
     private ImageLoader imageLoader;
@@ -98,7 +100,13 @@ public class MainActivity extends AppCompatActivity{
                     Toast.makeText(MainActivity.this, "流行趋势", Toast.LENGTH_SHORT).show();
                     break;
                 case R.id.arsenal_my_repo:
-                    Toast.makeText(MainActivity.this, "我的收藏", Toast.LENGTH_SHORT).show();
+                    if (favoriteFragment == null){
+                        favoriteFragment = new FavoriteFragment();
+                    }
+                    if (!favoriteFragment.isAdded()){
+                        replaceFragment(favoriteFragment);
+                    }
+                    drawerLayout.closeDrawers();
                     break;
                 case R.id.arsenal_recommend:
                     Toast.makeText(MainActivity.this, "推荐", Toast.LENGTH_SHORT).show();
