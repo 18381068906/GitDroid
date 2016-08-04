@@ -3,14 +3,16 @@ package com.feicuiedu.gitdroid.favorite;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -21,8 +23,6 @@ import com.feicuiedu.gitdroid.favorite.dao.LocalRepoDao;
 import com.feicuiedu.gitdroid.favorite.dao.RepoDao;
 import com.feicuiedu.gitdroid.favorite.model.LocalRepo;
 import com.feicuiedu.gitdroid.favorite.model.RepoGroupTable;
-import com.feicuiedu.gitdroid.hotrepo.Repo;
-import com.feicuiedu.gitdroid.repoinfo.RepoInfoActivity;
 
 import java.util.List;
 
@@ -40,6 +40,8 @@ public class FavoriteFragment extends Fragment implements PopupMenu.OnMenuItemCl
     private RepoDao repoDao;
     private LocalRepoAdapter adapter;
     private LocalRepoDao localRepoDao;
+    private LocalRepo localRepo;
+    private int groupID;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -55,6 +57,7 @@ public class FavoriteFragment extends Fragment implements PopupMenu.OnMenuItemCl
         localRepoDao = new LocalRepoDao(getContext());
         repoDao = new RepoDao(getContext());
         adapter.addAll(localRepoDao.queryForAll());
+        registerForContextMenu(listView);
     }
 
     @OnClick(R.id.btnFilter)
@@ -74,12 +77,13 @@ public class FavoriteFragment extends Fragment implements PopupMenu.OnMenuItemCl
     public boolean onMenuItemClick(MenuItem item) {
         String text = item.getTitle().toString();
         tvGroupType.setText(text);
-        setData(item);
+        groupID = item.getItemId();
+        setData();
         return true;
     }
 
-    private void setData(MenuItem item) {
-        switch (item.getItemId()){
+    private void setData() {
+        switch (groupID){
             case R.id.repo_group_all:
                 adapter.clear();
                 adapter.addAll(localRepoDao.queryForAll());
@@ -90,8 +94,50 @@ public class FavoriteFragment extends Fragment implements PopupMenu.OnMenuItemCl
                 break;
             default:
                 adapter.clear();
-                adapter.addAll(localRepoDao.queryForGroupId(item.getItemId()));
+                adapter.addAll(localRepoDao.queryForGroupId(groupID));
                 break;
         }
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        AdapterView.AdapterContextMenuInfo menuInfo1 = (AdapterView.AdapterContextMenuInfo) menuInfo;
+        int position = menuInfo1.position;
+        localRepo = adapter.getItem(position);
+        if (v.getId() == R.id.listView){
+            MenuInflater menuInflater = getActivity().getMenuInflater();
+            menuInflater.inflate(R.menu.menu_context_favorite,menu);
+            SubMenu subMenu = menu.findItem(R.id.sub_menu_move).getSubMenu();
+            List<RepoGroupTable> mlist = repoDao.findAll();
+            for (RepoGroupTable table :mlist){
+                subMenu.add(R.id.menu_group_move,table.getId(),Menu.NONE,table.getName());
+            }
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        RepoGroupTable mTable = repoDao.findByID((long) id);
+        if (item.getItemId()==R.id.delete){
+            localRepoDao.delete(localRepo);
+            setData();
+            return true;
+        }
+        if (item.getGroupId() == R.id.menu_group_move){
+            switch (item.getItemId()){
+                case R.id.repo_group_no:
+                    localRepo.setRepoGroup(null);
+                    break;
+                default:
+                    localRepo.setRepoGroup(mTable);
+                    break;
+            }
+            localRepoDao.creatOrUpdata(localRepo);
+            setData();
+        }
+
+        return super.onContextItemSelected(item);
     }
 }

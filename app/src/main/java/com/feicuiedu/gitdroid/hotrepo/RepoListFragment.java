@@ -1,5 +1,8 @@
 package com.feicuiedu.gitdroid.hotrepo;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -13,6 +16,9 @@ import android.widget.Toast;
 
 import com.feicuiedu.gitdroid.R;
 import com.feicuiedu.gitdroid.components.FooterView;
+import com.feicuiedu.gitdroid.favorite.dao.LocalRepoDao;
+import com.feicuiedu.gitdroid.favorite.model.LocalRepo;
+import com.feicuiedu.gitdroid.favorite.model.RepoConverter;
 import com.feicuiedu.gitdroid.repoinfo.RepoInfoActivity;
 import com.mugen.Mugen;
 import com.mugen.MugenCallbacks;
@@ -50,6 +56,7 @@ public class RepoListFragment extends Fragment implements RepoListView {
     private RepoListPresenter presenter;
     private FooterView footerView;
     private RepoListAdapter adapter;
+    private LocalRepoDao localRepoDao;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -63,11 +70,44 @@ public class RepoListFragment extends Fragment implements RepoListView {
         presenter = new RepoListPresenter(this,getLanguage());
         adapter = new RepoListAdapter();
         listView.setAdapter(adapter);
+        localRepoDao = new LocalRepoDao(getContext());
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Repo repo = adapter.getItem(position);
                 RepoInfoActivity.open(getContext(), repo);
+            }
+        });
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle("添加收藏 ");
+                builder.setMessage("是否添加到收藏中？");
+                builder.setPositiveButton("是", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Repo repo = adapter.getItem(position);
+                        LocalRepo localRepo = RepoConverter.convert(repo);
+                        if (localRepoDao.queryForID(localRepo.getId())==null){
+                            localRepoDao.creatOrUpdata(localRepo);
+                        }else {
+                            Toast.makeText(getContext(), "已经添加过了", Toast.LENGTH_SHORT).show();
+                        }
+
+                        dialog.dismiss();
+                    }
+                });
+                builder.setNegativeButton("否", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        dialog.dismiss();
+                    }
+                });
+                builder.create().show();
+
+                return true;
             }
         });
         initHead();

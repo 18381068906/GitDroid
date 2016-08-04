@@ -59,7 +59,7 @@ public class LocalRepoAdapter extends BaseAdapter {
         LocalRepo repo = getItem(position); // 当前item选的"数据"
         viewHolder.tvRepoName.setText(repo.getFullName());
         viewHolder.tvRepoInfo.setText(repo.getDescription());
-        viewHolder.tvRepoStars.setText(repo.getStartCount() + "");
+        viewHolder.tvRepoStars.setText("stars: "+repo.getStartCount() + "");
         ImageLoader.getInstance().displayImage(repo.getAvatar(), viewHolder.ivIcon);
         return convertView;
     }

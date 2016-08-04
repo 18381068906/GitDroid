@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity{
                     drawerLayout.closeDrawers();
                     break;
                 case R.id.github_trend:
-                    Toast.makeText(MainActivity.this, "流行趋势", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "功能完善中", Toast.LENGTH_SHORT).show();
                     break;
                 case R.id.arsenal_my_repo:
                     if (favoriteFragment == null){
@@ -109,13 +109,13 @@ public class MainActivity extends AppCompatActivity{
                     drawerLayout.closeDrawers();
                     break;
                 case R.id.arsenal_recommend:
-                    Toast.makeText(MainActivity.this, "推荐", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "功能完善中", Toast.LENGTH_SHORT).show();
                     break;
                 case R.id.tips_daily:
-                    Toast.makeText(MainActivity.this, "每日干货", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "功能完善中", Toast.LENGTH_SHORT).show();
                     break;
                 case R.id.tips_share:
-                    Toast.makeText(MainActivity.this, "分享", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "功能完善中", Toast.LENGTH_SHORT).show();
                     break;
             }
             return false;

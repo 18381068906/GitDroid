@@ -32,8 +32,11 @@ public class LocalRepoDao {
             e.printStackTrace();
         }
         this.context = context;
-        localRepos = getDefaultGroups();
-        creatOrUpdata(localRepos);
+        if (queryForAll()==null){
+            localRepos = getDefaultGroups();
+            creatOrUpdata(localRepos);
+        }
+
     }
     //添加或更新表
     public void creatOrUpdata(LocalRepo table){
@@ -92,6 +95,13 @@ public class LocalRepoDao {
             return dao.queryForAll();
         } catch (SQLException e) {
             throw new RuntimeException();
+        }
+    }
+    public LocalRepo queryForID(Long id){
+        try {
+            return dao.queryForId(id);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
     //添加默认数据
