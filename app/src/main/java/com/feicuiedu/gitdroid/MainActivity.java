@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.feicuiedu.gitdroid.commons.ActivityUtils;
 import com.feicuiedu.gitdroid.favorite.FavoriteFragment;
+import com.feicuiedu.gitdroid.gank.GankFragment;
 import com.feicuiedu.gitdroid.hotrepo.HotRepoFragment;
 import com.feicuiedu.gitdroid.hotuser.HotUserFragment;
 import com.feicuiedu.gitdroid.login.LoginActivity;
@@ -33,6 +34,7 @@ public class MainActivity extends AppCompatActivity{
     private HotRepoFragment hotRepoFragment;
     private HotUserFragment hotUserFragment;
     private FavoriteFragment favoriteFragment;
+    private GankFragment gankFragment;
     private Button btnLogin;
     private ImageView ivIcon;
     private ImageLoader imageLoader;
@@ -112,7 +114,13 @@ public class MainActivity extends AppCompatActivity{
                     Toast.makeText(MainActivity.this, "功能完善中", Toast.LENGTH_SHORT).show();
                     break;
                 case R.id.tips_daily:
-                    Toast.makeText(MainActivity.this, "功能完善中", Toast.LENGTH_SHORT).show();
+                    if (gankFragment == null){
+                        gankFragment = new GankFragment();
+                    }
+                    if (!gankFragment.isAdded()){
+                        replaceFragment(gankFragment);
+                    }
+                    drawerLayout.closeDrawers();
                     break;
                 case R.id.tips_share:
                     Toast.makeText(MainActivity.this, "功能完善中", Toast.LENGTH_SHORT).show();
